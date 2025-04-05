@@ -31,6 +31,7 @@ export default function WeatherDetails() {
   const dispatch = useDispatch();
   const [selectedCity, setSelectedCity] = useState('');
   const [historicalData, setHistoricalData] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Get both the entire weather state and cities data
   const weatherState = useSelector(state => state.weather);
@@ -41,6 +42,18 @@ export default function WeatherDetails() {
   // console.log('Cities Data:', cities);
   // console.log('Selected City:', selectedCity);
   // console.log('Selected City Data:', selectedCity ? cities[selectedCity] : null);
+
+  // Handle window resize and initial mobile check
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Initial data fetch for default cities if none exist
   useEffect(() => {
@@ -135,9 +148,9 @@ export default function WeatherDetails() {
         position: 'top',
         labels: {
           usePointStyle: true,
-          padding: window?.innerWidth < 768 ? 10 : 20,
+          padding: isMobile ? 10 : 20,
           font: {
-            size: window?.innerWidth < 768 ? 10 : 12,
+            size: isMobile ? 10 : 12,
             family: "'Inter', sans-serif"
           }
         }
@@ -146,13 +159,13 @@ export default function WeatherDetails() {
         display: true,
         text: '5-Day Weather Forecast',
         font: {
-          size: window?.innerWidth < 768 ? 14 : 16,
+          size: isMobile ? 14 : 16,
           family: "'Inter', sans-serif",
           weight: 'bold'
         },
         padding: {
           top: 10,
-          bottom: window?.innerWidth < 768 ? 10 : 30
+          bottom: isMobile ? 10 : 30
         }
       },
       tooltip: {
@@ -160,13 +173,13 @@ export default function WeatherDetails() {
         titleColor: '#000',
         bodyColor: '#666',
         bodyFont: {
-          size: window?.innerWidth < 768 ? 10 : 12
+          size: isMobile ? 10 : 12
         },
         titleFont: {
-          size: window?.innerWidth < 768 ? 12 : 14,
+          size: isMobile ? 12 : 14,
           weight: 'bold'
         },
-        padding: window?.innerWidth < 768 ? 8 : 12,
+        padding: isMobile ? 8 : 12,
         borderColor: 'rgba(0, 0, 0, 0.1)',
         borderWidth: 1,
         displayColors: true,
@@ -190,9 +203,9 @@ export default function WeatherDetails() {
           maxRotation: 45,
           minRotation: 45,
           font: {
-            size: window?.innerWidth < 768 ? 8 : 11
+            size: isMobile ? 8 : 11
           },
-          maxTicksLimit: window?.innerWidth < 768 ? 8 : 15 // Show fewer ticks on mobile
+          maxTicksLimit: isMobile ? 8 : 15
         }
       },
       y: {
@@ -200,7 +213,7 @@ export default function WeatherDetails() {
         display: true,
         position: 'left',
         title: {
-          display: window?.innerWidth >= 768, // Hide title on mobile
+          display: !isMobile,
           text: 'Temperature (°C)',
           font: {
             size: 12
@@ -214,7 +227,7 @@ export default function WeatherDetails() {
             return `${value}°C`;
           },
           font: {
-            size: window?.innerWidth < 768 ? 8 : 11
+            size: isMobile ? 8 : 11
           }
         }
       },
@@ -223,7 +236,7 @@ export default function WeatherDetails() {
         display: true,
         position: 'right',
         title: {
-          display: window?.innerWidth >= 768, // Hide title on mobile
+          display: !isMobile,
           text: 'Humidity (%)',
           font: {
             size: 12
@@ -237,7 +250,7 @@ export default function WeatherDetails() {
             return `${value}%`;
           },
           font: {
-            size: window?.innerWidth < 768 ? 8 : 11
+            size: isMobile ? 8 : 11
           }
         }
       }

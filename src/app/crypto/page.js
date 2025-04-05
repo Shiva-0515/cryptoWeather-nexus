@@ -33,7 +33,20 @@ export default function CryptoDetails() {
   const [alertPrice, setAlertPrice] = useState('');
   const [alertType, setAlertType] = useState('above'); // 'above' or 'below'
   const [notifications, setNotifications] = useState([]);
+  const [isMobile, setIsMobile] = useState(false);
   const coins = useSelector(state => state.crypto.coins);
+
+  // Handle window resize and initial mobile check
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const fetchHistoricalData = async () => {
@@ -134,9 +147,9 @@ export default function CryptoDetails() {
         position: 'top',
         labels: {
           usePointStyle: true,
-          padding: 20,
+          padding: isMobile ? 10 : 20,
           font: {
-            size: window?.innerWidth < 768 ? 10 : 12,
+            size: isMobile ? 10 : 12,
             family: "'Inter', sans-serif"
           }
         }
@@ -145,13 +158,13 @@ export default function CryptoDetails() {
         display: true,
         text: '30-Day Price and Volume History',
         font: {
-          size: window?.innerWidth < 768 ? 14 : 16,
+          size: isMobile ? 14 : 16,
           family: "'Inter', sans-serif",
           weight: 'bold'
         },
         padding: {
           top: 10,
-          bottom: window?.innerWidth < 768 ? 10 : 30
+          bottom: isMobile ? 10 : 30
         }
       },
       tooltip: {
@@ -159,13 +172,13 @@ export default function CryptoDetails() {
         titleColor: '#000',
         bodyColor: '#666',
         bodyFont: {
-          size: window?.innerWidth < 768 ? 10 : 12
+          size: isMobile ? 10 : 12
         },
         titleFont: {
-          size: window?.innerWidth < 768 ? 12 : 14,
+          size: isMobile ? 12 : 14,
           weight: 'bold'
         },
-        padding: window?.innerWidth < 768 ? 8 : 12,
+        padding: isMobile ? 8 : 12,
         borderColor: 'rgba(0, 0, 0, 0.1)',
         borderWidth: 1,
         displayColors: true,
@@ -189,9 +202,9 @@ export default function CryptoDetails() {
           maxRotation: 45,
           minRotation: 45,
           font: {
-            size: window?.innerWidth < 768 ? 8 : 11
+            size: isMobile ? 8 : 11
           },
-          maxTicksLimit: window?.innerWidth < 768 ? 8 : 15
+          maxTicksLimit: isMobile ? 8 : 15
         }
       },
       y: {
@@ -199,7 +212,7 @@ export default function CryptoDetails() {
         display: true,
         position: 'left',
         title: {
-          display: window?.innerWidth >= 768,
+          display: !isMobile,
           text: 'Price (USD)',
           font: {
             size: 12
@@ -213,7 +226,7 @@ export default function CryptoDetails() {
             return formatPrice(value);
           },
           font: {
-            size: window?.innerWidth < 768 ? 8 : 11
+            size: isMobile ? 8 : 11
           }
         }
       },
@@ -222,7 +235,7 @@ export default function CryptoDetails() {
         display: true,
         position: 'right',
         title: {
-          display: window?.innerWidth >= 768,
+          display: !isMobile,
           text: 'Volume (USD)',
           font: {
             size: 12
@@ -236,7 +249,7 @@ export default function CryptoDetails() {
             return formatVolume(value);
           },
           font: {
-            size: window?.innerWidth < 768 ? 8 : 11
+            size: isMobile ? 8 : 11
           }
         }
       }
