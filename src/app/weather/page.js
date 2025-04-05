@@ -37,10 +37,10 @@ export default function WeatherDetails() {
   const cities = useSelector(state => state.weather?.cities || {});
 
   // Debug logs
-  console.log('Entire Weather State:', weatherState);
-  console.log('Cities Data:', cities);
-  console.log('Selected City:', selectedCity);
-  console.log('Selected City Data:', selectedCity ? cities[selectedCity] : null);
+  // console.log('Entire Weather State:', weatherState);
+  // console.log('Cities Data:', cities);
+  // console.log('Selected City:', selectedCity);
+  // console.log('Selected City Data:', selectedCity ? cities[selectedCity] : null);
 
   // Initial data fetch for default cities if none exist
   useEffect(() => {
@@ -62,7 +62,7 @@ export default function WeatherDetails() {
         );
         const data = await response.json();
         if (data.cod === '200') {
-          console.log('Historical Data Received:', data);
+          // console.log('Historical Data Received:', data);
           setHistoricalData(data);
         } else {
           console.error('Error fetching forecast:', data.message);
@@ -125,6 +125,7 @@ export default function WeatherDetails() {
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     interaction: {
       mode: 'index',
       intersect: false,
@@ -134,9 +135,9 @@ export default function WeatherDetails() {
         position: 'top',
         labels: {
           usePointStyle: true,
-          padding: 20,
+          padding: window?.innerWidth < 768 ? 10 : 20,
           font: {
-            size: 12,
+            size: window?.innerWidth < 768 ? 10 : 12,
             family: "'Inter', sans-serif"
           }
         }
@@ -145,13 +146,13 @@ export default function WeatherDetails() {
         display: true,
         text: '5-Day Weather Forecast',
         font: {
-          size: 16,
+          size: window?.innerWidth < 768 ? 14 : 16,
           family: "'Inter', sans-serif",
           weight: 'bold'
         },
         padding: {
           top: 10,
-          bottom: 30
+          bottom: window?.innerWidth < 768 ? 10 : 30
         }
       },
       tooltip: {
@@ -159,17 +160,25 @@ export default function WeatherDetails() {
         titleColor: '#000',
         bodyColor: '#666',
         bodyFont: {
-          size: 12
+          size: window?.innerWidth < 768 ? 10 : 12
         },
         titleFont: {
-          size: 14,
+          size: window?.innerWidth < 768 ? 12 : 14,
           weight: 'bold'
         },
-        padding: 12,
+        padding: window?.innerWidth < 768 ? 8 : 12,
         borderColor: 'rgba(0, 0, 0, 0.1)',
         borderWidth: 1,
         displayColors: true,
         usePointStyle: true,
+        callbacks: {
+          label: function(context) {
+            if (context.datasetIndex === 0) {
+              return `Temperature: ${context.parsed.y}°C`;
+            }
+            return `Humidity: ${context.parsed.y}%`;
+          }
+        }
       }
     },
     scales: {
@@ -179,7 +188,11 @@ export default function WeatherDetails() {
         },
         ticks: {
           maxRotation: 45,
-          minRotation: 45
+          minRotation: 45,
+          font: {
+            size: window?.innerWidth < 768 ? 8 : 11
+          },
+          maxTicksLimit: window?.innerWidth < 768 ? 8 : 15 // Show fewer ticks on mobile
         }
       },
       y: {
@@ -187,7 +200,7 @@ export default function WeatherDetails() {
         display: true,
         position: 'left',
         title: {
-          display: true,
+          display: window?.innerWidth >= 768, // Hide title on mobile
           text: 'Temperature (°C)',
           font: {
             size: 12
@@ -195,6 +208,14 @@ export default function WeatherDetails() {
         },
         grid: {
           color: 'rgba(0, 0, 0, 0.05)'
+        },
+        ticks: {
+          callback: function(value) {
+            return `${value}°C`;
+          },
+          font: {
+            size: window?.innerWidth < 768 ? 8 : 11
+          }
         }
       },
       y1: {
@@ -202,7 +223,7 @@ export default function WeatherDetails() {
         display: true,
         position: 'right',
         title: {
-          display: true,
+          display: window?.innerWidth >= 768, // Hide title on mobile
           text: 'Humidity (%)',
           font: {
             size: 12
@@ -210,6 +231,14 @@ export default function WeatherDetails() {
         },
         grid: {
           display: false
+        },
+        ticks: {
+          callback: function(value) {
+            return `${value}%`;
+          },
+          font: {
+            size: window?.innerWidth < 768 ? 8 : 11
+          }
         }
       }
     }
@@ -286,8 +315,10 @@ export default function WeatherDetails() {
       )}
 
       {chartData && (
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-          <Line data={chartData} options={chartOptions} />
+        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-lg">
+          <div className="h-[300px] sm:h-[400px]">
+            <Line data={chartData} options={chartOptions} />
+          </div>
         </div>
       )}
     </div>

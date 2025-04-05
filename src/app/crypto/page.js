@@ -38,12 +38,12 @@ export default function CryptoDetails() {
   useEffect(() => {
     const fetchHistoricalData = async () => {
       try {
-        console.log('Fetching historical data for:', selectedCoin);
+        // console.log('Fetching historical data for:', selectedCoin);
         const response = await fetch(
           `https://api.coingecko.com/api/v3/coins/${selectedCoin}/market_chart?vs_currency=usd&days=30&interval=daily`
         );
         const data = await response.json();
-        console.log('Historical data received:', data);
+        // console.log('Historical data received:', data);
         setHistoricalData(data);
       } catch (error) {
         console.error('Error fetching historical data:', error);
@@ -55,7 +55,7 @@ export default function CryptoDetails() {
 
   useEffect(() => {
     if (historicalData) {
-      console.log('Chart data processed:', chartData);
+      // console.log('Chart data processed:', chartData);
     }
   }, [historicalData]);
 
@@ -124,6 +124,7 @@ export default function CryptoDetails() {
 
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     interaction: {
       mode: 'index',
       intersect: false,
@@ -135,7 +136,7 @@ export default function CryptoDetails() {
           usePointStyle: true,
           padding: 20,
           font: {
-            size: 12,
+            size: window?.innerWidth < 768 ? 10 : 12,
             family: "'Inter', sans-serif"
           }
         }
@@ -144,13 +145,13 @@ export default function CryptoDetails() {
         display: true,
         text: '30-Day Price and Volume History',
         font: {
-          size: 16,
+          size: window?.innerWidth < 768 ? 14 : 16,
           family: "'Inter', sans-serif",
           weight: 'bold'
         },
         padding: {
           top: 10,
-          bottom: 30
+          bottom: window?.innerWidth < 768 ? 10 : 30
         }
       },
       tooltip: {
@@ -158,13 +159,13 @@ export default function CryptoDetails() {
         titleColor: '#000',
         bodyColor: '#666',
         bodyFont: {
-          size: 12
+          size: window?.innerWidth < 768 ? 10 : 12
         },
         titleFont: {
-          size: 14,
+          size: window?.innerWidth < 768 ? 12 : 14,
           weight: 'bold'
         },
-        padding: 12,
+        padding: window?.innerWidth < 768 ? 8 : 12,
         borderColor: 'rgba(0, 0, 0, 0.1)',
         borderWidth: 1,
         displayColors: true,
@@ -188,8 +189,9 @@ export default function CryptoDetails() {
           maxRotation: 45,
           minRotation: 45,
           font: {
-            size: 11
-          }
+            size: window?.innerWidth < 768 ? 8 : 11
+          },
+          maxTicksLimit: window?.innerWidth < 768 ? 8 : 15
         }
       },
       y: {
@@ -197,7 +199,7 @@ export default function CryptoDetails() {
         display: true,
         position: 'left',
         title: {
-          display: true,
+          display: window?.innerWidth >= 768,
           text: 'Price (USD)',
           font: {
             size: 12
@@ -209,6 +211,9 @@ export default function CryptoDetails() {
         ticks: {
           callback: function(value) {
             return formatPrice(value);
+          },
+          font: {
+            size: window?.innerWidth < 768 ? 8 : 11
           }
         }
       },
@@ -217,7 +222,7 @@ export default function CryptoDetails() {
         display: true,
         position: 'right',
         title: {
-          display: true,
+          display: window?.innerWidth >= 768,
           text: 'Volume (USD)',
           font: {
             size: 12
@@ -229,6 +234,9 @@ export default function CryptoDetails() {
         ticks: {
           callback: function(value) {
             return formatVolume(value);
+          },
+          font: {
+            size: window?.innerWidth < 768 ? 8 : 11
           }
         }
       }
@@ -472,8 +480,10 @@ export default function CryptoDetails() {
       )}
 
       {chartData && (
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
-          <Line data={chartData} options={chartOptions} />
+        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-lg">
+          <div className="h-[300px] sm:h-[400px]">
+            <Line data={chartData} options={chartOptions} />
+          </div>
         </div>
       )}
     </div>

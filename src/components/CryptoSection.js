@@ -27,7 +27,7 @@ export default function CryptoSection() {
     dispatch(toggleFavoriteCoin(coinId));
   };
 
-console.log(websocketStatus);
+// console.log(websocketStatus);
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
