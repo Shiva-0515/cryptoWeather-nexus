@@ -1,65 +1,59 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
-const BASE_URL = 'https://api.openweathermap.org/data/2.5';
-
 export const fetchWeatherData = createAsyncThunk(
   'weather/fetchWeatherData',
   async (city) => {
-    const response = await axios.get(
-      `${BASE_URL}/weather?q=${city}&units=metric&appid=${API_KEY}`
-    );
-    return response.data;
+    try {
+      const response = await axios.get(
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY}&units=metric`
+      );
+      console.log('Weather API Response:', response.data); // Debug log
+      return { city, data: response.data };
+    } catch (error) {
+      console.error('Weather API Error:', error.response?.data || error.message);
+      throw error;
+    }
   }
 );
 
 const initialState = {
-  cities: {
-    'New York': { data: null, loading: false, error: null },
-    'London': { data: null, loading: false, error: null },
-    'Tokyo': { data: null, loading: false, error: null },
-  },
-  alerts: [],
+  cities: {},
+  status: 'idle',
+  error: null,
 };
 
-const weatherSlice = createSlice({
+export const weatherSlice = createSlice({
   name: 'weather',
   initialState,
   reducers: {
-    addWeatherAlert: (state, action) => {
-      state.alerts.push(action.payload);
-    },
-    clearWeatherAlerts: (state) => {
-      state.alerts = [];
+    updateWeather: (state, action) => {
+      const { city, data } = action.payload;
+      if (city) {
+        state.cities[city] = { data };
+      }
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchWeatherData.pending, (state, action) => {
-        const city = action.meta.arg;
-        if (state.cities[city]) {
-          state.cities[city].loading = true;
-          state.cities[city].error = null;
-        }
+      .addCase(fetchWeatherData.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
       })
       .addCase(fetchWeatherData.fulfilled, (state, action) => {
-        const city = action.meta.arg;
-        if (state.cities[city]) {
-          state.cities[city].loading = false;
-          state.cities[city].data = action.payload;
-          state.cities[city].error = null;
-        }
+        state.status = 'succeeded';
+        state.cities[action.payload.city] = {
+          data: action.payload.data,
+          lastUpdated: new Date().toISOString()
+        };
+        state.error = null;
       })
       .addCase(fetchWeatherData.rejected, (state, action) => {
-        const city = action.meta.arg;
-        if (state.cities[city]) {
-          state.cities[city].loading = false;
-          state.cities[city].error = action.error.message;
-        }
+        state.status = 'failed';
+        state.error = action.error.message;
       });
   },
 });
 
-export const { addWeatherAlert, clearWeatherAlerts } = weatherSlice.actions;
+export const { updateWeather } = weatherSlice.actions;
 export default weatherSlice.reducer; 

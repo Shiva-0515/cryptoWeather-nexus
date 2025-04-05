@@ -26,7 +26,7 @@ export default function Home() {
       cities.forEach(city => dispatch(fetchWeatherData(city)));
       coins.forEach(coin => dispatch(fetchCryptoData(coin)));
       dispatch(fetchNewsData());
-    }, 60000); // Refresh every minute
+    }, 300000); // Refresh every 5 minutes instead of every minute
 
     return () => clearInterval(refreshInterval);
   }, [dispatch]);

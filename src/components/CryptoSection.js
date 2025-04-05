@@ -1,9 +1,11 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { toggleFavoriteCoin } from '../redux/slices/preferencesSlice';
 import { StarIcon as StarIconOutline } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
+import wsService from '../services/websocket';
 
 export default function CryptoSection() {
   const dispatch = useDispatch();
@@ -11,10 +13,21 @@ export default function CryptoSection() {
   const favoriteCoins = useSelector(state => state.preferences.favoriteCoins);
   const websocketStatus = useSelector(state => state.crypto.websocketStatus);
 
+  useEffect(() => {
+    // Initialize WebSocket connection
+    wsService.connect();
+
+    // Cleanup on unmount
+    return () => {
+      wsService.disconnect();
+    };
+  }, []);
+
   const handleFavoriteToggle = (coinId) => {
     dispatch(toggleFavoriteCoin(coinId));
   };
 
+console.log(websocketStatus);
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',

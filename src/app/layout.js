@@ -1,13 +1,13 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { Providers } from './providers';
-import { Toaster } from 'react-hot-toast';
+import { Providers } from '../redux/provider';
+import Navbar from '../components/Navbar';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
   title: 'CryptoWeather Nexus',
-  description: 'Real-time crypto and weather dashboard',
+  description: 'Real-time crypto prices and weather updates',
 };
 
 export default function RootLayout({ children }) {
@@ -15,8 +15,10 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          {children}
-          <Toaster position="top-right" />
+          <Navbar />
+          <main className="min-h-screen bg-gray-100 dark:bg-gray-900">
+            {children}
+          </main>
         </Providers>
       </body>
     </html>
